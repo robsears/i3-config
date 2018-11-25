@@ -160,7 +160,7 @@ maybeUpdateIps() {
 			return 0
 		fi
 	fi
-	sh "${DIR}/network-info.sh" > "${DATA}/public-ipv4"
+	sh "${DIR}/network-info.sh"
 }
 
 # Update the ping and upload/download speeds if the data has expired or does not
@@ -176,7 +176,7 @@ maybeUpdateSpeeds() {
 			return 0
 		fi
 	fi
-	sh "${DIR}/internet-speeds.sh" > "${DATA}/internet-speeds"
+	sh "${DIR}/internet-speeds.sh"
 }
 
 # Determine the local IP address for a given network interface

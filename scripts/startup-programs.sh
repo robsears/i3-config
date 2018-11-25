@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 # Update the network info right away, because it may have changed
-exec ${DIR}/network-info.sh
+i3-msg "exec ${DIR}/network-info.sh"
 
 # Create a terminal in workspace 3
 i3-msg 'workspace "3: term", exec /usr/bin/terminator'
