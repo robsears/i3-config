@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Performs a standard screen lock, with an extra bit of style. Before locking
+# the screen, it takes a screenshot of the current desktop image and programatically
+# blurs and desaturates the image, using that for the lock screen background.
+#
+# Requirements: i3-lock imagemagick [scrot]
+
+base=/tmp/i3-lock-wrapper-$(date "+%s")
+file1=base.jpg
+file2=base2.png
+
+# Looks for an existing background image set by feh. If there isn't one, then
+# it takes a screenshot, blurs it, then uses that as the lock screen. If feh
+# has set a background image, then that image is blurred and resized, and
+# tiled across the screen.
+
+bgimg=$(cat ~/.fehbg | egrep "\-\-bg-" | sed -r "s/.*\-\-bg\-.* +'([-_\ \/&\.,a-zA-Z0-9]{1,})'.*/\1/")
+if [ -z "$bgimg" ]; then
+  if [[ $(which import) ]]; then
+    import -window root "$file1"
+  elif [[ $(which scrot) ]]; then
+    scrot -d0 "$file1"
+  else
+    echo "Screenshot command not found (scrot or import). Exiting."
+  fi
+  convert "${file1}" -blur 0x4 -modulate 110,50 "$file2"
+  i3lock -f -i "$file2"
+  rm "${file1}"
+else
+  file1="${bgimg}"
+  convert "${file1}" -blur 0x4 -modulate 110,50 -resize 1920x1080 "$file2"
+  i3lock -fti "$file2"
+fi
+
+rm "$file2"

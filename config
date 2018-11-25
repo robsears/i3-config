@@ -1,0 +1,178 @@
+# Rob's i3 config file
+
+##
+# Variables
+##
+set $alt            Mod1
+set $windows        Mod4
+set $scripts        ~/.i3/scripts
+set $left_monitor   DP-5
+set $center_monitor DP-3
+set $right_monitor  HDMI-0
+
+##
+# Custom Hotkeys
+##
+
+# Lock screen (this script does a little more than just locking the screen)
+bindsym $alt+Ctrl+l exec $scripts/lock-wrapper
+
+# Suspend
+bindsym $alt+Shift+s exec $scripts/suspend
+
+# Take a screenshot, OSX-style. Requires MAIM.
+bindsym $alt+Shift+4      exec maim -s --format=png ~/Desktop/Screenshot\ $(date +%s).png
+bindsym $alt+Ctrl+Shift+4 exec maim -s --format=png /dev/stdout | xclip -selection clipboard -t image/png -i
+
+# Start a terminal in active screen. Can add 'h' or 'v' to align it with other apps.
+bindsym $windows+Return exec terminator
+
+# Kill focused window. Also kills the application running in the window.
+bindsym $windows+Shift+q kill
+
+# Program launcher
+bindsym $windows+d exec --no-startup-id i3-dmenu-desktop
+
+# Reload the configuration file
+bindsym $windows+Shift+c reload
+
+# Restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $windows+Shift+r restart
+
+# Exit i3 (logs you out of your X session)
+bindsym $windows+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
+
+##
+# Status Bar
+##
+bar {
+        status_command    $scripts/status.sh
+        position          bottom
+        mode              dock
+        workspace_buttons yes
+        tray_output       none
+        font              pango:Droid Sans 8
+        colors {
+                background          #333333
+                statusline          #dddddd
+                separator           #aaaaaa
+                focused_workspace   #777777 #cccccc #444444
+                active_workspace    #777777 #cccccc #444444
+                inactive_workspace  #555555 #444444 #cccccc
+                urgent_workspace    #999999 #ffffff #222222
+        }
+}
+
+##
+# Workspace Management
+##
+
+font pango:DejaVu Sans Mono 8
+
+# Define named workspaces on specific monitors:
+workspace "1: main" output    $center_monitor
+workspace "2: chat" output    $left_monitor
+workspace "3: term" output    $right_monitor
+workspace "4: spotify" output $right_monitor
+workspace "5: atom" output    $center_monitor
+
+# Configure applications to launch on certain workspaces.
+# Note: these are global settings.
+assign [class="Firefox"] "1: main"
+assign [class="Slack"]   "2: chat"
+assign [class="Atom"]    "5: atom"
+for_window [class="Spotify"] move to workspace "4: spotify"
+
+# Switch to workspace
+bindsym $windows+1 workspace number 1
+bindsym $windows+2 workspace number 2
+bindsym $windows+3 workspace number 3
+bindsym $windows+4 workspace number 4
+bindsym $windows+5 workspace number 5
+bindsym $windows+6 workspace number 6
+bindsym $windows+7 workspace number 7
+bindsym $windows+8 workspace number 8
+
+# Move focused container to workspace
+bindsym $windows+Shift+1 move container to workspace number 1
+bindsym $windows+Shift+2 move container to workspace number 2
+bindsym $windows+Shift+3 move container to workspace number 3
+bindsym $windows+Shift+4 move container to workspace number 4
+bindsym $windows+Shift+5 move container to workspace number 5
+bindsym $windows+Shift+6 move container to workspace number 6
+bindsym $windows+Shift+7 move container to workspace number 7
+bindsym $windows+Shift+8 move container to workspace number 8
+
+# Use Mouse+$windows to drag floating windows to their wanted position
+floating_modifier $windows
+
+# Change focus
+bindsym $windows+Left focus left
+bindsym $windows+Down focus down
+bindsym $windows+Up focus up
+bindsym $windows+Right focus right
+
+# Move focused window
+bindsym $windows+Shift+Left move left
+bindsym $windows+Shift+Down move down
+bindsym $windows+Shift+Up move up
+bindsym $windows+Shift+Right move right
+
+# Split in horizontal orientation
+bindsym $windows+h split h
+
+# Split in vertical orientation
+bindsym $windows+v split v
+
+# Enter fullscreen mode for the focused container
+bindsym $windows+f fullscreen
+
+# Change container layout (stacked, tabbed, toggle split)
+bindsym $windows+s layout stacking
+bindsym $windows+w layout tabbed
+bindsym $windows+e layout toggle split
+
+# Toggle tiling / floating
+bindsym $windows+Shift+space floating toggle
+
+# Change focus between tiling / floating windows
+bindsym $windows+space focus mode_toggle
+
+# Focus the parent container
+bindsym $windows+a focus parent
+
+# Resize window (you can also use the mouse for that)
+mode "resize" {
+        # These bindings trigger as soon as you enter the resize mode
+
+        # Pressing left will shrink the window’s width.
+        # Pressing right will grow the window’s width.
+        # Pressing up will shrink the window’s height.
+        # Pressing down will grow the window’s height.
+        bindsym j resize shrink width 10 px or 10 ppt
+        bindsym k resize grow height 10 px or 10 ppt
+        bindsym l resize shrink height 10 px or 10 ppt
+        bindsym semicolon resize grow width 10 px or 10 ppt
+
+        # same bindings, but for the arrow keys
+        bindsym Left resize shrink width 10 px or 10 ppt
+        bindsym Down resize grow height 10 px or 10 ppt
+        bindsym Up resize shrink height 10 px or 10 ppt
+        bindsym Right resize grow width 10 px or 10 ppt
+
+        # back to normal: Enter or Escape
+        bindsym Return mode "default"
+        bindsym Escape mode "default"
+}
+
+bindsym $windows+r mode "resize"
+
+##
+# Startup Scripts
+##
+
+# Set up multiple monitors
+exec $scripts/xrandr.sh
+
+# Launch startup programs
+exec $scripts/startup-programs.sh
