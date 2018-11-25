@@ -1,0 +1,3 @@
+This directory contains cached data that is served by the status bar.
+
+The contents of these cached files are ignored by git.
