@@ -1,4 +1,6 @@
 #!/bin/bash
-
 # Lock the screen and use systemd to suspend the computer.
-(~/bin/i3-lock-wrapper; systemctl suspend)
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+sh "${DIR}/lock-wrapper" && systemctl suspend
