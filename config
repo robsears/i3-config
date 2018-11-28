@@ -42,6 +42,28 @@ bindsym $windows+Shift+r restart
 # Exit i3 (logs you out of your X session)
 bindsym $windows+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -b 'Yes, exit i3' 'i3-msg exit'"
 
+###
+# Media Player Controls
+##
+
+# Windows + Print screen key jumps to start of song, or previous song
+bindsym $windows+Print         exec "$scripts/mediaplayer.sh 'previous'"
+
+# Windows + Scroll lock key toggles the play/pause playback state
+bindsym $windows+Scroll_Lock   exec "$scripts/mediaplayer.sh 'toggle'"
+
+# Windows + Pause key jumps to next song
+bindsym $windows+Pause         exec "$scripts/mediaplayer.sh 'next'"
+
+# Windows + PageUp key increases the system volume
+bindsym $windows+Prior         exec "$scripts/mediaplayer.sh 'volume_up'"
+
+# Windows + PageDn key decreases the system volume
+bindsym $windows+Next          exec "$scripts/mediaplayer.sh 'volume_down'"
+
+# Windows + Shift + PageDn key mutes/unmutes the system volume
+bindsym $windows+Shift+Next    exec "$scripts/mediaplayer.sh 'volume_mute'"
+
 ##
 # Status Bar
 ##
