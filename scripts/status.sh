@@ -147,6 +147,22 @@ dhcp() {
 	fi
 }
 
+# Update the weather information if it has expired or does not exist. This
+# architecture is used to keep from wasting bandwidth and resources every
+# 1s. The outdoor temperature won't change on that time scale.
+# No inputs accepted.
+maybeUpdateWeather() {
+        if [ -f "${DATA}/weather" ]; then
+                current_epoch=$(date +%s)
+                weather_last_checked_epoch=$(stat -c '%Y' "${DATA}/weather")
+                age=$(echo "($current_epoch - $weather_last_checked_epoch)" | bc)
+                if [ "$age" -lt "$REFRESH" ]; then
+                        return 0
+                fi
+        fi
+        sh "${DIR}/weather.sh"
+}
+
 # Update the IP address information if it has expired or does not exist. This
 # architecture is used to keep from wasting bandwidth by checking the public
 # IPv4 every 1s. It's not going to change *that* often.
@@ -314,12 +330,21 @@ getDownSpeed() {
 
 }
 
+# Get the temperature outside.
+# No inputs accepted.
+# Returns a JSON representation of the temperature outside.
+getOutsideTemp() {
+	maybeUpdateWeather
+	temp=$(egrep '^[0-5]+' ${DATA}/weather | head -n1)
+	echo '{ "full_text": "It is '$temp' °F outside" }'
+}
+
 # Print data out and sleep 1s forever. This updates the status bar every second.
 echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getIfaceIp 'wlan'), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getIfaceIp 'wlan'), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(dateTime)]"
 	sleep 1
 done
 echo ']'
