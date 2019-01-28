@@ -335,7 +335,7 @@ getDownSpeed() {
 # Returns a JSON representation of the temperature outside.
 getOutsideTemp() {
 	maybeUpdateWeather
-	temp=$(egrep '^[0-5]+' ${DATA}/weather | head -n1)
+	temp=$(cat ${DATA}/weather | head -n1)
 	echo '{ "full_text": "It is '$temp' °F outside" }'
 }
 

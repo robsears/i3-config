@@ -12,4 +12,4 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATA="${DIR}/../data"
 
 # Cache the weather information:
-echo "$(curl -s 'wttr.in/?1QT' | grep -m1 '°F' | sed -r 's/.* ([0-9]+)-.*/\1/')" > "${DATA}/weather"
+echo "$(curl -s 'wttr.in/?1QT' | grep -m1 '°F' | sed -r 's/.* (-?[0-9]+)-?.*/\1/')" > "${DATA}/weather"
