@@ -19,7 +19,7 @@ i3-msg 'exec /usr/bin/atom; exec /usr/bin/slack; exec /usr/bin/spotify'
 
 # Open up Firefox in a new window (to keep it from being a new tab in the
 # window containing the support desk app). This will open in the main workspace.
-i3-msg 'exec /usr/bin/firefox --new-window http://gmail.com'
+i3-msg 'exec /usr/bin/firefox --new-window http://gmail.com https://twist.com'
 
 # Wait for everything to load, then move the Support Desk window to the chat space
 sleep 7
