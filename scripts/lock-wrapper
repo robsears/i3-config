@@ -15,8 +15,7 @@ file2=base2.png
 # has set a background image, then that image is blurred and resized, and
 # tiled across the screen.
 
-bgimg=$(cat ~/.fehbg | egrep "\-\-bg-" | sed -r "s/.*\-\-bg\-.* +'([-_\ \/&\.,a-zA-Z0-9]{1,})'.*/\1/")
-if [ -z "$bgimg" ]; then
+if [ ! -f .desktop-background ]; then
   if [[ $(which import) ]]; then
     import -window root "$file1"
   elif [[ $(which scrot) ]]; then
@@ -28,9 +27,9 @@ if [ -z "$bgimg" ]; then
   i3lock -f -i "$file2"
   rm "${file1}"
 else
-  file1="${bgimg}"
-  convert "${file1}" -blur 0x4 -modulate 110,50 -resize 1920x1080 "$file2"
+  convert .desktop-background -blur 0x4 -modulate 110,50 "$file2"
   i3lock -fti "$file2"
 fi
 
 rm "$file2"
+
