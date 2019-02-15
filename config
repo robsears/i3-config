@@ -193,6 +193,9 @@ bindsym $windows+r mode "resize"
 # Startup Scripts
 ##
 
+# Set the background image
+exec feh --bg-scale --no-xinerama --no-fehbg .desktop-background
+
 # Set up multiple monitors
 exec $scripts/xrandr.sh
 
