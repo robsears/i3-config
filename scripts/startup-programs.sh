@@ -11,16 +11,10 @@ i3-msg 'workspace "3: term", exec /usr/bin/terminator'
 # Open Firefox to the support desk I use. This will automatically open in the
 # main workspace, but I like to group it with Slack in the chat workspace. This
 # will get fixed in a few seconds.
-i3-msg 'exec /usr/bin/firefox https://secure.helpscout.net/dashboard'
+i3-msg 'exec /usr/bin/firefox https://gmail.com https://protonmail.com'
 
-# Open up apps that I use all the time: Atom, Slack, and Spotify.
+# Open up apps that I use all the time: Atom, Libreoffice, and Spotify.
 # These will all automatically load in workspaces defined in ../config.
-i3-msg 'exec /usr/bin/atom; exec /usr/bin/slack; exec /usr/bin/spotify'
-
-# Open up Firefox in a new window (to keep it from being a new tab in the
-# window containing the support desk app). This will open in the main workspace.
-i3-msg 'exec /usr/bin/firefox --new-window http://gmail.com'
-
-# Wait for everything to load, then move the Support Desk window to the chat space
-sleep 7
-i3-msg '[class="Firefox" title="Dashboard - OMC - Mozilla Firefox"] move to workspace "2: chat"'
+i3-msg 'exec /usr/bin/atom'
+i3-msg 'workspace 2, exec /usr/bin/libreoffice'
+i3-msg 'exec /usr/bin/spotify'
