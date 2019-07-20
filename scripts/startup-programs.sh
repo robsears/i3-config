@@ -11,7 +11,7 @@ i3-msg 'workspace "3: term", exec /usr/bin/terminator'
 # Open Firefox to the support desk I use. This will automatically open in the
 # main workspace, but I like to group it with Slack in the chat workspace. This
 # will get fixed in a few seconds.
-i3-msg 'exec /usr/bin/firefox https://gmail.com https://protonmail.com'
+i3-msg 'exec /usr/bin/brave https://gmail.com https://protonmail.com'
 
 # Open up apps that I use all the time: Atom, Libreoffice, and Spotify.
 # These will all automatically load in workspaces defined in ../config.
