@@ -1,3 +1,4 @@
+# i3 config file (v4)
 # Rob's i3 config file
 
 ##
@@ -9,6 +10,9 @@ set $scripts        ~/.i3/scripts
 set $left_monitor   DP-5
 set $center_monitor DP-3
 set $right_monitor  HDMI-0
+
+# Set up multiple monitors
+exec $scripts/xrandr.sh
 
 ##
 # Custom Hotkeys
@@ -22,6 +26,7 @@ bindsym $alt+Shift+s exec $scripts/suspend
 
 # Take a screenshot, OSX-style. Requires MAIM.
 bindsym $alt+Shift+4      exec maim -s --format=png ~/Desktop/Screenshot\ $(date +%s).png
+bindsym $alt+Shift+5      exec maim    --format=png ~/Desktop/Screenshot\ $(date +%s).png
 bindsym $alt+Ctrl+Shift+4 exec maim -s --format=png /dev/stdout | xclip -selection clipboard -t image/png -i
 
 # Start a terminal in active screen. Can add 'h' or 'v' to align it with other apps.
@@ -32,6 +37,7 @@ bindsym $windows+Shift+q kill
 
 # Program launcher
 bindsym $windows+d exec --no-startup-id i3-dmenu-desktop
+bindcode $alt+65 exec --no-startup-id i3-dmenu-desktop
 
 # Reload the configuration file
 bindsym $windows+Shift+c reload
@@ -81,14 +87,14 @@ bindsym $windows+F11                exec "$scripts/adjust-brightness.sh 'reset'"
 bindsym $windows+Shift+F11          exec "$scripts/adjust-brightness.sh 'off'"
 
 ##
-# Status Bar
+# Status Barf
 ##
 bar {
         status_command    $scripts/status.sh
         position          bottom
         mode              dock
         workspace_buttons yes
-        tray_output       none
+        tray_output       $center_monitor
         font              pango:Droid Sans 8
         colors {
                 background          #333333
@@ -108,18 +114,27 @@ bar {
 font pango:DejaVu Sans Mono 8
 
 # Define named workspaces on specific monitors:
-workspace "1: main" output    $center_monitor
-workspace "2: chat" output    $left_monitor
-workspace "3: term" output    $right_monitor
-workspace "4: spotify" output $right_monitor
-workspace "5: atom" output    $center_monitor
+workspace "web"        output $center_monitor
+workspace "atom"       output $center_monitor
+workspace "idea"       output $center_monitor
+workspace "gnucash"    output $center_monitor
+workspace "term"       output $right_monitor
+workspace "spotify"    output $right_monitor
+workspace "vol"        output $right_monitor
+workspace "slack"      output $left_monitor
+workspace "protonmail" output $left_monitor
 
 # Configure applications to launch on certain workspaces.
 # Note: these are global settings.
-assign [class="Firefox"] "1: main"
-assign [class="Slack"]   "2: chat"
-assign [class="Atom"]    "5: atom"
-for_window [class="Spotify"] move to workspace "4: spotify"
+assign [class="Brave"]    "web"
+assign [class="i3-frame"] "idea"
+assign [class="jetbrains-idea-ce"] "idea"
+assign [class="Slack"]    "slack"
+assign [class="Atom"]     "atom"
+assign [class="Gnucash"]  "gnucash"
+for_window [class="Spotify"]    move to workspace "spotify"
+for_window [title=".*Proton.*"] move to workspace "protonmail"
+for_window [title="Volume Control"] move to workspace "vol"
 
 # Switch to workspace
 bindsym $windows+1 workspace number 1
@@ -130,6 +145,7 @@ bindsym $windows+5 workspace number 5
 bindsym $windows+6 workspace number 6
 bindsym $windows+7 workspace number 7
 bindsym $windows+8 workspace number 8
+bindsym $windows+n exec --no-startup-id "$scripts/empty_workspace.sh"
 
 # Move focused container to workspace
 bindsym $windows+Shift+1 move container to workspace number 1
@@ -211,9 +227,6 @@ bindsym $windows+r mode "resize"
 
 # Set the background image
 exec feh --bg-scale --no-xinerama --no-fehbg .desktop-background
-
-# Set up multiple monitors
-exec $scripts/xrandr.sh
 
 # Launch startup programs
 exec $scripts/startup-programs.sh

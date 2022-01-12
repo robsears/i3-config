@@ -132,9 +132,18 @@ getVol() {
 # No inputs accepted.
 # Returns a JSON representation of the time.
 dateTime() {
-	date=$(date '+%Y-%m-%d %H:%M:%S')
-	echo '{ "full_text": " '$date' " }'
+	date=$(date '+%Y-%m-%d %H:%M:%S %Z')
+	echo '{ "full_text": " '$date' ", "color": "'${color_good}'" }'
 }
+
+# Get the current date and time, in the local time zone.
+# No inputs accepted.
+# Returns a JSON representation of the time.
+utcTime() {
+        date=$(date -u '+%Y-%m-%d %H:%M:%S %Z')
+        echo '{ "full_text": " UTC: '$date' ", "color": "'#BFFFF4'" }'
+}
+
 
 # Determine whether DHCP is running
 # No inputs accepted.
@@ -201,24 +210,24 @@ maybeUpdateSpeeds() {
 # Returns a JSON representation of the interface and its IP address if one exists.
 getIfaceIp() {
 	maybeUpdateIps
-	if [[ $1 == 'wlan' ]]; then
-		if [[ $(ip link | grep wlp3s0 | wc -l) == 1 ]]; then
-			dev=wlp3s0
-		elif [[ $(ip link | grep wlan | wc -l) == 1 ]]; then
-			dev=wlan0
-		fi
-		text='wlan: '
-	elif [[ $1 == 'eth' ]]; then
-		if [[ $(ip link | grep enp1s | wc -l) == 1 ]]; then
-			dev=enp1s0
-		elif [[ $(ip link | grep eth | wc -l) == 1 ]]; then
-			dev=eth1
-		elif [[ $(ip link | grep eno | wc -l) == 1 ]]; then
-			dev=eno1
-		fi
-		text='eth: '
-	fi
-	ip=$(ip addr show dev $dev  | grep 'inet ' | sed 's/    inet \([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\).*/\1/')
+#	if [[ $1 == 'wlan' ]]; then
+#		if [[ $(ip link | grep wlp3s0 | wc -l) == 1 ]]; then
+#			dev=wlp3s0
+#		elif [[ $(ip link | grep wlan | wc -l) == 1 ]]; then
+#			dev=wlan0
+#		fi
+#		text='wlan: '
+#	elif [[ $1 == 'eth' ]]; then
+#		if [[ $(ip link | grep enp1s | wc -l) == 1 ]]; then
+#			dev=enp1s0
+#		elif [[ $(ip link | grep eth | wc -l) == 1 ]]; then
+#			dev=eth1
+#		elif [[ $(ip link | grep eno | wc -l) == 1 ]]; then
+#			dev=eno1
+#		fi
+#		text='eth: '
+#	fi
+	ip=$(grep 'local-ipv4' "${DATA}/public-ipv4" | sed -r 's/^local-ipv4: (.*)/Local IP: \1/' )
 	if [[ -z $ip ]]; then
 		echo '{ "full_text": " '$text'none ", "color": "'$color_bad'" }'
 	else
@@ -235,7 +244,7 @@ getPublicIp() {
 	if [[ -z "${public_ipv4}" ]]; then
 		echo '{ "full_text": "No public IP", "color": "'$color_bad'" }'
 	else
-		echo '{ "full_text": "IP: '$public_ipv4'", "color": "'$color_good'" }'
+		echo '{ "full_text": "Public IP: '$public_ipv4'", "color": "'$color_good'" }'
 	fi
 }
 
@@ -339,12 +348,17 @@ getOutsideTemp() {
 	echo '{ "full_text": "It is '$temp' °F outside" }'
 }
 
+getNetwork() {
+	ssid=$(cat ${DATA}/network)
+        echo '{ "full_text": "'$ssid'" }'
+}
+
 # Print data out and sleep 1s forever. This updates the status bar every second.
 echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getIfaceIp 'wlan'), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(dateTime)]"
 	sleep 1
 done
 echo ']'
