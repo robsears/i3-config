@@ -353,12 +353,32 @@ getNetwork() {
         echo '{ "full_text": "'$ssid'" }'
 }
 
+getLoad() {
+	# load="$(echo "scale=1;100.0 * $(uptime | sed -r 's/.*average: (\S+),.*/\1/')/$(nproc).0" | bc)%"
+	load=$(uptime | sed -r 's/.*average: (\S+),.*/\1/')
+	cpus=$(nproc)
+        if [[ $(bc <<< "${load} < (0.25 * $(nproc))") = 1 ]]; then
+                color=$color_low
+        elif [[ $(bc <<< "${load} >= (0.25 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < (0.5 * $(nproc))") = 1 ]]; then
+                color=$color_medlow
+        elif [[ $(bc <<< "${load} >= (0.5 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < (0.75 * $(nproc))") = 1 ]]; then
+                color=$color_med
+        elif [[ $(bc <<< "${load} >= (0.75 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < $(nproc)") = 1 ]]; then
+                color=$color_medhigh
+        elif [[ $(bc <<< "${load} >= $(nproc)") = 1 ]]; then
+                color=$color_high
+        fi
+
+	loadstr="$(echo "scale=1;100.0*${load}/${cpus}" | bc)%"
+	echo '{ "full_text": "System load: '$loadstr'", "color":"'$color'" }'
+}
+
 # Print data out and sleep 1s forever. This updates the status bar every second.
 echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(dateTime)]"
 	sleep 1
 done
 echo ']'
