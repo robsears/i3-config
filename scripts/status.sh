@@ -144,6 +144,15 @@ utcTime() {
         echo '{ "full_text": " UTC: '$date' ", "color": "'#BFFFF4'" }'
 }
 
+# Get the current date and time, in the local time zone.
+# Accepts a timezone name
+# Returns a JSON representation of the time.
+timeElsewhere() {
+	tz=$1
+        date=$(TZ=${tz} date '+%Y-%m-%d %H:%M:%S %Z')
+        echo '{ "full_text": " '$tz': '$date' ", "color": "'#ffff00'" }'
+}
+
 
 # Determine whether DHCP is running
 # No inputs accepted.
@@ -378,7 +387,7 @@ echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(timeElsewhere 'Australia/Perth'), $(dateTime)]"
 	sleep 1
 done
 echo ']'

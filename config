@@ -114,29 +114,31 @@ bar {
 font pango:DejaVu Sans Mono 8
 
 # Define named workspaces on specific monitors:
-workspace "web"        output $center_monitor
-workspace "atom"       output $center_monitor
-workspace "idea"       output $center_monitor
-workspace "gnucash"    output $center_monitor
-workspace "joplin"     output $center_monitor
-workspace "term"       output $right_monitor
-workspace "spotify"    output $right_monitor
-workspace "vol"        output $right_monitor
-workspace "slack"      output $left_monitor
-workspace "protonmail" output $left_monitor
+workspace "web"         output $center_monitor
+workspace "atom"        output $center_monitor
+workspace "idea"        output $center_monitor
+workspace "gnucash"     output $center_monitor
+workspace "joplin"      output $center_monitor
+workspace "spreadsheet" output $center_monitor
+workspace "term"        output $right_monitor
+workspace "spotify"     output $right_monitor
+workspace "vol"         output $right_monitor
+workspace "slack"       output $left_monitor
+workspace "protonmail"  output $left_monitor
 
 # Configure applications to launch on certain workspaces.
 # Note: these are global settings.
-assign [class="Brave"]             "web"
-assign [class="i3-frame"]          "idea"
-assign [class="jetbrains-idea-ce"] "idea"
-assign [class="Slack"]             "slack"
-assign [class="Atom"]              "atom"
-assign [class="Gnucash"]           "gnucash"
-assign [class="Joplin"]            "joplin"
-for_window [class="Spotify"]        move to workspace "spotify"
-for_window [title=".*Proton.*"]     move to workspace "protonmail"
-for_window [title="Volume Control"] move to workspace "vol"
+assign [class="Brave"]                "web"
+assign [class="i3-frame"]             "idea"
+assign [class="jetbrains-idea-ce"]    "idea"
+assign [class="Slack"]                "slack"
+assign [class="Atom"]                 "atom"
+assign [class="Gnucash"]              "gnucash"
+assign [class="Joplin"]               "joplin"
+for_window [class="Spotify"]          move to workspace "spotify"
+for_window [title=".*Proton.*"]       move to workspace "protonmail"
+for_window [title="Volume Control"]   move to workspace "vol"
+for_window [class="libreoffice-calc"] move to workspace "spreadsheet"
 
 # Switch to workspace
 bindsym $windows+1 workspace number 1
