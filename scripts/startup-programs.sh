@@ -8,13 +8,11 @@ i3-msg "exec ${DIR}/network-info.sh"
 # Create a terminal in workspace 3
 i3-msg 'workspace "3: term", exec /usr/bin/terminator'
 
-# Open Firefox to the support desk I use. This will automatically open in the
-# main workspace, but I like to group it with Slack in the chat workspace. This
-# will get fixed in a few seconds.
-i3-msg 'exec /usr/bin/brave https://gmail.com https://protonmail.com'
+# Oen up a browser to my email client
+i3-msg 'exec /usr/bin/brave https://protonmail.com'
 
 # Open up apps that I use all the time: Atom, Libreoffice, and Spotify.
 # These will all automatically load in workspaces defined in ../config.
 i3-msg 'exec /usr/bin/atom'
-i3-msg 'workspace 2, exec /usr/bin/libreoffice'
+i3-msg 'workspace "2: budget", exec /usr/bin/gnucash'
 i3-msg 'exec /usr/bin/spotify'

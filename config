@@ -32,6 +32,7 @@ bindsym $windows+Shift+q kill
 
 # Program launcher
 bindsym $windows+d exec --no-startup-id i3-dmenu-desktop
+bindcode $alt+65 exec --no-startup-id i3-dmenu-desktop
 
 # Reload the configuration file
 bindsym $windows+Shift+c reload
@@ -108,18 +109,19 @@ bar {
 font pango:DejaVu Sans Mono 8
 
 # Define named workspaces on specific monitors:
-workspace "1: main" output    $center_monitor
-workspace "2: chat" output    $left_monitor
-workspace "3: term" output    $right_monitor
-workspace "4: spotify" output $right_monitor
-workspace "5: atom" output    $center_monitor
+workspace "1: internet" output $center_monitor
+workspace "2: budget"   output $left_monitor
+workspace "3: term"     output $right_monitor
+workspace "4: spotify"  output $right_monitor
+workspace "5: atom"     output $center_monitor
 
 # Configure applications to launch on certain workspaces.
 # Note: these are global settings.
-assign [class="Firefox"] "1: main"
-assign [class="Slack"]   "2: chat"
+assign [class="Brave"]   "1: internet"
+assign [class="Firefox"] "1: internet"
 assign [class="Atom"]    "5: atom"
 for_window [class="Spotify"] move to workspace "4: spotify"
+for_window [class="GnuCash"] move to workspace "2: budget"
 
 # Switch to workspace
 bindsym $windows+1 workspace number 1
@@ -140,6 +142,7 @@ bindsym $windows+Shift+5 move container to workspace number 5
 bindsym $windows+Shift+6 move container to workspace number 6
 bindsym $windows+Shift+7 move container to workspace number 7
 bindsym $windows+Shift+8 move container to workspace number 8
+bindsym $windows+n exec --no-startup-id "$scripts/empty_workspace.sh"
 
 # Use Mouse+$windows to drag floating windows to their wanted position
 floating_modifier $windows
