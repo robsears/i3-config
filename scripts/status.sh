@@ -3,6 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATA="${DIR}/../data"
 REFRESH=600 # Seconds for the internet speed and IP information to live
+PIHOLE_REFRESH=30 # seconds for the pi-hole service to live
 
 # Light colors
 color_bad="#ee7777"
@@ -213,6 +214,20 @@ maybeUpdateSpeeds() {
 	sh "${DIR}/internet-speeds.sh"
 }
 
+# Update the status of the pihole.
+# No inputs accepted.
+maybeUpdatePihole() {
+        if [ -f "${DATA}/pihole" ]; then
+                current_epoch=$(date +%s)
+                weather_last_checked_epoch=$(stat -c '%Y' "${DATA}/pihole")
+                age=$(echo "($current_epoch - $weather_last_checked_epoch)" | bc)
+                if [ "$age" -lt "$PIHOLE_REFRESH" ]; then
+                        return 0
+                fi
+        fi
+        sh "${DIR}/rpi-status.sh"
+}
+
 # Determine the local IP address for a given network interface
 # Accepts either 'wlan' for a wireless interface or 'eth' for a wired interface.
 # The network interfaces for these inputs are hard-coded.
@@ -382,12 +397,25 @@ getLoad() {
 	echo '{ "full_text": "System load: '$loadstr'", "color":"'$color'" }'
 }
 
+getPiholeStatus() {
+	maybeUpdatePihole
+	status=$(cat ${DATA}/pihole | grep status)
+	if [ "${status}" = "status:online" ]; then
+		color=$color_low
+		value="online"
+	else
+		color=$color_high
+		value="offline"
+	fi
+	echo '{ "full_text": "PiHole: '$value'", "color":"'$color'" }'
+}
+
 # Print data out and sleep 1s forever. This updates the status bar every second.
 echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(utcTime), $(timeElsewhere 'Australia/Perth'), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getPiholeStatus), $(getOutsideTemp), $(utcTime), $(timeElsewhere 'Australia/Perth'), $(dateTime)]"
 	sleep 1
 done
 echo ']'
