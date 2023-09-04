@@ -118,16 +118,23 @@ workspace "web"         output $center_monitor
 workspace "atom"        output $center_monitor
 workspace "idea"        output $center_monitor
 workspace "gnucash"     output $center_monitor
+workspace "firefox"     output $center_monitor
 workspace "joplin"      output $center_monitor
 workspace "spreadsheet" output $center_monitor
+workspace "code"        output $center_monitor
 workspace "term"        output $right_monitor
+workspace "kitty"       output $right_monitor
 workspace "spotify"     output $right_monitor
 workspace "vol"         output $right_monitor
 workspace "slack"       output $left_monitor
 workspace "protonmail"  output $left_monitor
+workspace "security"    output $left_monitor
 
 # Configure applications to launch on certain workspaces.
 # Note: these are global settings.
+# Note: To get the class and instance, you can use xprop. The first
+# part of the WM_CLASS is the instance ("irssi" in this example),
+# the second part is the class ("URxvt" in this example).
 assign [class="Brave"]                "web"
 assign [class="i3-frame"]             "idea"
 assign [class="jetbrains-idea-ce"]    "idea"
@@ -135,6 +142,9 @@ assign [class="Slack"]                "slack"
 assign [class="Atom"]                 "atom"
 assign [class="Gnucash"]              "gnucash"
 assign [class="Joplin"]               "joplin"
+assign [class="Code"]                 "code"
+assign [class="firefox"]              "firefox"
+assign [class="kitty"]                "kitty"
 for_window [class="Spotify"]          move to workspace "spotify"
 for_window [title=".*Proton.*"]       move to workspace "protonmail"
 for_window [title="Volume Control"]   move to workspace "vol"

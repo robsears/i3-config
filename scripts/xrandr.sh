@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Organizes multiple monitors.
 # This script uses xrandr to define the orientation of several monitors. xrandr

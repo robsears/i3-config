@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
@@ -15,7 +15,7 @@ i3-msg 'workspace "web"; exec /usr/bin/brave'
 
 # Open up apps that I use all the time: Atom, Slack, and Spotify.
 # These will all automatically load in workspaces defined in ../config.
-i3-msg 'workspace "atom"; exec /usr/bin/atom; workspace "chat"; exec /usr/bin/slack; workspace "spotify"; exec /usr/bin/spotify'
+i3-msg 'workspace "code"; exec /usr/bin/code; workspace "chat"; exec /usr/bin/slack; workspace "spotify"; exec /usr/bin/spotify'
 
 # Open up Firefox in a new window (to keep it from being a new tab in the
 # window containing the support desk app). This will open in the main workspace.
@@ -27,3 +27,8 @@ i3-msg 'workspace "protonmail"; exec /usr/bin/brave --new-window -incognito http
 sleep 7
 #i3-msg '[class="Brave" title="Dashboard - OMC - Brave"] move to workspace "2: chat"'
 #i3-msg '[class="Brave" title="Proton Account - Brave"] move to workspace "protonmail"'
+
+# Launch the security cameras
+i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 1'
+i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 2'
+i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 3'

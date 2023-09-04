@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 countDisplays() {
   xrandr --listactivemonitors | grep Monitor | sed -r 's/.*: ([0-9]{1,})/\1/'

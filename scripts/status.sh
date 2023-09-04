@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATA="${DIR}/../data"
 REFRESH=600 # Seconds for the internet speed and IP information to live
-PIHOLE_REFRESH=30 # seconds for the pi-hole service to live
+PIHOLE_REFRESH=10 # seconds for the pi-hole service to live
 
 # Light colors
 color_bad="#ee7777"
@@ -277,7 +277,7 @@ getPublicIp() {
 # Returns a JSON representation of the ping time for this computer.
 getPing() {
 	maybeUpdateSpeeds
-	pingtime=$(grep 'ping' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	pingtime=$(grep 'Ping' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
 	pingms=$(printf %.0f $(echo "$pingtime" | bc -l))
 	if [[ $(bc <<< "${pingms} < 20") = 1 ]]; then
 		color=$color_low
@@ -298,7 +298,7 @@ getPing() {
 # Returns a JSON representation of the upload speed for this computer.
 getUpSpeed() {
 	maybeUpdateSpeeds
-	bpsup=$(grep 'bps-up' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	bpsup=$(echo "$(grep 'Upload' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')*1000000" | bc)
 	if [[ $(bc <<< "${bpsup} < 5000000") = 1 ]]; then
                 color=$color_high
         elif [[ $(bc <<< "${bpsup} >= 5000000") = 1 ]] && [[ $(bc <<< "${bpsup} < 10000000") = 1 ]]; then
@@ -333,7 +333,7 @@ getUpSpeed() {
 # Returns a JSON representation of the download speed for this computer.
 getDownSpeed() {
 	maybeUpdateSpeeds
-	bpsdown=$(grep 'bps-down' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	bpsdown=$(echo "$(grep 'Download' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')*1000000" | bc)
 	if [[ $(bc <<< "${bpsdown} < 5000000") = 1 ]]; then
                 color=$color_high
         elif [[ $(bc <<< "${bpsdown} >= 5000000") = 1 ]] && [[ $(bc <<< "${bpsdown} < 10000000") = 1 ]]; then
@@ -401,8 +401,20 @@ getPiholeStatus() {
 	maybeUpdatePihole
 	status=$(cat ${DATA}/pihole | grep status)
 	if [ "${status}" = "status:online" ]; then
-		color=$color_low
-		value="online"
+        	cpu=$(   cat ${DATA}/pihole | grep cpu    | sed -r 's/.*\:([0-9\.]{1,})%/\1/')
+        	temp=$(  cat ${DATA}/pihole | grep temp   | sed -r 's/.*\:(\S+) F/\1 F/')
+	        uptime=$(cat ${DATA}/pihole | grep uptime | sed -r 's/.*\:up//' | tr ',' ':' | tr -d ' ' | sed -r 's/([0-9]{1,}[dhmy])[a-z\:]{1,}/\1/g')
+
+		if   [[ $(bc <<< "${cpu} <= 25.0") = 1 ]]; then
+			color=$color_low
+		elif [[ $(bc <<< "${cpu} <= 50.0") = 1 ]]; then
+			color=$color_medlow
+		elif [[ $(bc <<< "${cpu} <= 75.0") = 1 ]]; then
+			color=$color_medhigh
+		else
+			color=$color_high
+		fi
+		value="online(${cpu}%, ${uptime}, ${temp})"
 	else
 		color=$color_high
 		value="offline"
@@ -410,12 +422,17 @@ getPiholeStatus() {
 	echo '{ "full_text": "PiHole: '$value'", "color":"'$color'" }'
 }
 
+getDriveWear() {
+	value="$(sudo smartctl -a ${1} | grep 'Wear_Leveling_Count' | sed -r 's/^(\S+) +(\S+) +(\S+) +0(\S+) .*/\4/')%"
+	echo '{ "full_text": "'$1': '$value'", "color":"'$color_good'" }'
+}
+
 # Print data out and sleep 1s forever. This updates the status bar every second.
 echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getNetwork), $(getIfaceIp), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getPiholeStatus), $(getOutsideTemp), $(utcTime), $(timeElsewhere 'Australia/Perth'), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getPublicIp), $(getPing), $(getOutsideTemp), $(utcTime), $(dateTime)]"
 	sleep 1
 done
 echo ']'
