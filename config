@@ -6,9 +6,9 @@
 ##
 set $alt            Mod1
 set $windows        Mod4
-set $scripts        ~/.i3/scripts
+set $scripts        ~/.config/i3/scripts
 set $left_monitor   DP-5
-set $center_monitor DP-3
+set $center_monitor DP-1
 set $right_monitor  HDMI-0
 
 # Set up multiple monitors

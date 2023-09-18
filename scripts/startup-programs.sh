@@ -27,8 +27,3 @@ i3-msg 'workspace "protonmail"; exec /usr/bin/brave --new-window -incognito http
 sleep 7
 #i3-msg '[class="Brave" title="Dashboard - OMC - Brave"] move to workspace "2: chat"'
 #i3-msg '[class="Brave" title="Proton Account - Brave"] move to workspace "protonmail"'
-
-# Launch the security cameras
-i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 1'
-i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 2'
-i3-msg 'workspace "security"; exec /home/work/bin/cams/vlccam 3'
