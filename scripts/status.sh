@@ -369,7 +369,7 @@ getDownSpeed() {
 getOutsideTemp() {
 	maybeUpdateWeather
 	temp=$(cat ${DATA}/weather | head -n1)
-	echo '{ "full_text": "It is '$temp' °F outside" }'
+	echo '{ "full_text": "It is '$temp' outside" }'
 }
 
 getNetwork() {

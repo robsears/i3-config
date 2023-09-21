@@ -11,9 +11,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATA="${DIR}/../data"
 
-# Cache the weather information.
-# Data from wttr.in can be either a single value, or a range matching
-# -?[0-9]+-?[0-9]+. The line below will take either input; single values will be
-# left unchanged, while ranges will be averaged
-#echo "$(curl -s 'wttr.in/?1QT' | grep -m1 '°F' | sed -r 's/.* ([-_0-9\.]{1,}) .*/\1/' | sed -r 's/(-?[0-9]{1,})[\-\.]{1}\.?(\-?[0-9]{1,})/\2/')" > "${DATA}/weather"
-echo "$(curl -s 'wttr.in/?1QT' | grep -m1 '°F' | sed -r 's/.* \+?(-?[0-9\.]{1,})[\(\S+\)]?.*/\1/')" > "${DATA}/weather"
+# The .weather-api file should contain the OpenWeatherMap API key, which is in
+#the .gitignore file so we don't need to commit it to source control.
+curl -s "https://api.openweathermap.org/data/2.5/weather?lat=41.2864&lon=-96.2345&appid=$(cat ./.weather-api)&units=imperial" | jq -r '"\(.main.feels_like)°F @ \(.main.humidity)%"'  > "${DATA}/weather"
