@@ -5,10 +5,20 @@ DATA="${DIR}/../data"
 REFRESH=600 # Seconds for the internet speed and IP information to live
 PIHOLE_REFRESH=10 # seconds for the pi-hole service to live
 
+# Dracula?
+#color_high="#50FA7B"
+#color_medhigh="#A0FA84"
+#color_med="#F1FA8C"
+#color_medlow="F8A871"
+#color_low="#FF5555"
+#color_degraded=$color_med
+#color_bad="#ee7777"
+#color_good="#77ee77"
+
+
 # Light colors
 color_bad="#ee7777"
 color_good="#77ee77"
-
 color_high="#ee7777"
 color_medhigh="#eebb77"
 color_med="#eeee77"

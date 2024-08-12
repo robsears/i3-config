@@ -89,6 +89,8 @@ bindsym $windows+Shift+F11          exec "$scripts/adjust-brightness.sh 'off'"
 ##
 # Status Barf
 ##
+# Old background color #333333
+# Old background line #dddddd
 bar {
         status_command    $scripts/status.sh
         position          bottom
@@ -97,7 +99,7 @@ bar {
         tray_output       $center_monitor
         font              pango:Droid Sans 8
         colors {
-                background          #333333
+                background          #282a36
                 statusline          #dddddd
                 separator           #aaaaaa
                 focused_workspace   #777777 #cccccc #444444
