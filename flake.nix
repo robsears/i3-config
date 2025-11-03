@@ -8,21 +8,12 @@
   outputs =
     inputs@{ self, nixpkgs }:
     let
-      # Since this is just configuration files, we don't need per-system outputs
-      # We'll use a dummy system just to get access to pkgs
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-
       systems = [
         "x86_64-linux"
         "aarch64-linux"
         "x86_64-darwin"
         "aarch64-darwin"
       ];
-
-      # plumb in various packages from platform and other inputs via overlays
-      overlays = import ./nix/overlays.nix inputs;
-
       forAllSystems =
         f:
         nixpkgs.lib.genAttrs systems (
@@ -30,7 +21,7 @@
           f (
             {
               pkgs = import nixpkgs {
-                inherit system overlays;
+                inherit system;
               };
               inherit system self;
               arch = builtins.elemAt (builtins.split "-" system) 0;
@@ -40,8 +31,31 @@
         );
     in
     {
-
+      # Define packages for all supported systems
       packages = forAllSystems (args: import ./nix/packages.nix args);
 
+      # Expose this flake as a NixOS module to easily integrate with NixOS and Home Manager
+      nixosModules.default =
+        { config, pkgs, ... }:
+        {
+          environment.systemPackages = with pkgs; [
+            self.packages.${pkgs.system}.default # scripts need to be in PATH and executable
+            i3 # i3 window manager, duh
+            maim # screenshot tool
+            terminator # terminal emulator
+            speedtest-cli # needed by internet-speeds script
+            feh # wallpaper setter
+            imagemagick # needed by maim for image processing
+            scrot # screenshot tool
+            # TODO: what other dependencies are needed?
+          ];
+
+          # put i3 config in the right place for NixOS with home-manager
+          home-manager.sharedModules = [
+            {
+              xdg.configFile."i3".source = "${self.packages.${pkgs.system}.default}";
+            }
+          ];
+        };
     };
 }
