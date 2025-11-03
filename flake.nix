@@ -41,6 +41,11 @@
             self.packages.${pkgs.system}.default
             speedtest-cli
           ];
+          home-manager.sharedModules = [
+            {
+              xdg.configFile."i3".source = "${self.packages.${pkgs.system}.default}";
+            }
+          ];
         };
     };
 }
