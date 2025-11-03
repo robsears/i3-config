@@ -7,3 +7,5 @@
 
 # Ignore all data files:
 data/*
+scripts/.weather-api
+result

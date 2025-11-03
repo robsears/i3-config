@@ -3,11 +3,22 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 DATA="${DIR}/../data"
 REFRESH=600 # Seconds for the internet speed and IP information to live
+PIHOLE_REFRESH=10 # seconds for the pi-hole service to live
+
+# Dracula?
+#color_high="#50FA7B"
+#color_medhigh="#A0FA84"
+#color_med="#F1FA8C"
+#color_medlow="F8A871"
+#color_low="#FF5555"
+#color_degraded=$color_med
+#color_bad="#ee7777"
+#color_good="#77ee77"
+
 
 # Light colors
 color_bad="#ee7777"
 color_good="#77ee77"
-
 color_high="#ee7777"
 color_medhigh="#eebb77"
 color_med="#eeee77"
@@ -132,9 +143,27 @@ getVol() {
 # No inputs accepted.
 # Returns a JSON representation of the time.
 dateTime() {
-	date=$(date '+%Y-%m-%d %H:%M:%S')
-	echo '{ "full_text": " '$date' " }'
+	date=$(date '+%Y-%m-%d %H:%M:%S %Z')
+	echo '{ "full_text": " '$date' ", "color": "'${color_good}'" }'
 }
+
+# Get the current date and time, in the local time zone.
+# No inputs accepted.
+# Returns a JSON representation of the time.
+utcTime() {
+        date=$(date -u '+%Y-%m-%d %H:%M:%S %Z')
+        echo '{ "full_text": " UTC: '$date' ", "color": "'#BFFFF4'" }'
+}
+
+# Get the current date and time, in the local time zone.
+# Accepts a timezone name
+# Returns a JSON representation of the time.
+timeElsewhere() {
+	tz=$1
+        date=$(TZ=${tz} date '+%Y-%m-%d %H:%M:%S %Z')
+        echo '{ "full_text": " '$tz': '$date' ", "color": "'#ffff00'" }'
+}
+
 
 # Determine whether DHCP is running
 # No inputs accepted.
@@ -195,30 +224,44 @@ maybeUpdateSpeeds() {
 	sh "${DIR}/internet-speeds.sh"
 }
 
+# Update the status of the pihole.
+# No inputs accepted.
+maybeUpdatePihole() {
+        if [ -f "${DATA}/pihole" ]; then
+                current_epoch=$(date +%s)
+                weather_last_checked_epoch=$(stat -c '%Y' "${DATA}/pihole")
+                age=$(echo "($current_epoch - $weather_last_checked_epoch)" | bc)
+                if [ "$age" -lt "$PIHOLE_REFRESH" ]; then
+                        return 0
+                fi
+        fi
+        sh "${DIR}/rpi-status.sh"
+}
+
 # Determine the local IP address for a given network interface
 # Accepts either 'wlan' for a wireless interface or 'eth' for a wired interface.
 # The network interfaces for these inputs are hard-coded.
 # Returns a JSON representation of the interface and its IP address if one exists.
 getIfaceIp() {
 	maybeUpdateIps
-	if [[ $1 == 'wlan' ]]; then
-		if [[ $(ip link | grep wlp3s0 | wc -l) == 1 ]]; then
-			dev=wlp3s0
-		elif [[ $(ip link | grep wlan | wc -l) == 1 ]]; then
-			dev=wlan0
-		fi
-		text='wlan: '
-	elif [[ $1 == 'eth' ]]; then
-		if [[ $(ip link | grep enp1s | wc -l) == 1 ]]; then
-			dev=enp1s0
-		elif [[ $(ip link | grep eth | wc -l) == 1 ]]; then
-			dev=eth1
-		elif [[ $(ip link | grep eno | wc -l) == 1 ]]; then
-			dev=eno1
-		fi
-		text='eth: '
-	fi
-	ip=$(ip addr show dev $dev  | grep 'inet ' | sed 's/    inet \([0-9]*\.[0-9]*\.[0-9]*\.[0-9]*\).*/\1/')
+#	if [[ $1 == 'wlan' ]]; then
+#		if [[ $(ip link | grep wlp3s0 | wc -l) == 1 ]]; then
+#			dev=wlp3s0
+#		elif [[ $(ip link | grep wlan | wc -l) == 1 ]]; then
+#			dev=wlan0
+#		fi
+#		text='wlan: '
+#	elif [[ $1 == 'eth' ]]; then
+#		if [[ $(ip link | grep enp1s | wc -l) == 1 ]]; then
+#			dev=enp1s0
+#		elif [[ $(ip link | grep eth | wc -l) == 1 ]]; then
+#			dev=eth1
+#		elif [[ $(ip link | grep eno | wc -l) == 1 ]]; then
+#			dev=eno1
+#		fi
+#		text='eth: '
+#	fi
+	ip=$(grep 'local-ipv4' "${DATA}/public-ipv4" | sed -r 's/^local-ipv4: (.*)/Local IP: \1/' )
 	if [[ -z $ip ]]; then
 		echo '{ "full_text": " '$text'none ", "color": "'$color_bad'" }'
 	else
@@ -235,7 +278,7 @@ getPublicIp() {
 	if [[ -z "${public_ipv4}" ]]; then
 		echo '{ "full_text": "No public IP", "color": "'$color_bad'" }'
 	else
-		echo '{ "full_text": "IP: '$public_ipv4'", "color": "'$color_good'" }'
+		echo '{ "full_text": "Public IP: '$public_ipv4'", "color": "'$color_good'" }'
 	fi
 }
 
@@ -244,7 +287,7 @@ getPublicIp() {
 # Returns a JSON representation of the ping time for this computer.
 getPing() {
 	maybeUpdateSpeeds
-	pingtime=$(grep 'ping' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	pingtime=$(grep 'Ping' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
 	pingms=$(printf %.0f $(echo "$pingtime" | bc -l))
 	if [[ $(bc <<< "${pingms} < 20") = 1 ]]; then
 		color=$color_low
@@ -265,7 +308,7 @@ getPing() {
 # Returns a JSON representation of the upload speed for this computer.
 getUpSpeed() {
 	maybeUpdateSpeeds
-	bpsup=$(grep 'bps-up' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	bpsup=$(echo "$(grep 'Upload' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')*1000000" | bc)
 	if [[ $(bc <<< "${bpsup} < 5000000") = 1 ]]; then
                 color=$color_high
         elif [[ $(bc <<< "${bpsup} >= 5000000") = 1 ]] && [[ $(bc <<< "${bpsup} < 10000000") = 1 ]]; then
@@ -300,7 +343,7 @@ getUpSpeed() {
 # Returns a JSON representation of the download speed for this computer.
 getDownSpeed() {
 	maybeUpdateSpeeds
-	bpsdown=$(grep 'bps-down' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')
+	bpsdown=$(echo "$(grep 'Download' "${DATA}/internet-speeds" | sed -r 's/.*: (.*)/\1/')*1000000" | bc)
 	if [[ $(bc <<< "${bpsdown} < 5000000") = 1 ]]; then
                 color=$color_high
         elif [[ $(bc <<< "${bpsdown} >= 5000000") = 1 ]] && [[ $(bc <<< "${bpsdown} < 10000000") = 1 ]]; then
@@ -336,7 +379,62 @@ getDownSpeed() {
 getOutsideTemp() {
 	maybeUpdateWeather
 	temp=$(cat ${DATA}/weather | head -n1)
-	echo '{ "full_text": "It is '$temp' °F outside" }'
+	echo '{ "full_text": "It is '$temp' outside" }'
+}
+
+getNetwork() {
+	ssid=$(cat ${DATA}/network)
+        echo '{ "full_text": "'$ssid'" }'
+}
+
+getLoad() {
+	# load="$(echo "scale=1;100.0 * $(uptime | sed -r 's/.*average: (\S+),.*/\1/')/$(nproc).0" | bc)%"
+	load=$(uptime | sed -r 's/.*average: (\S+),.*/\1/')
+	cpus=$(nproc)
+        if [[ $(bc <<< "${load} < (0.25 * $(nproc))") = 1 ]]; then
+                color=$color_low
+        elif [[ $(bc <<< "${load} >= (0.25 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < (0.5 * $(nproc))") = 1 ]]; then
+                color=$color_medlow
+        elif [[ $(bc <<< "${load} >= (0.5 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < (0.75 * $(nproc))") = 1 ]]; then
+                color=$color_med
+        elif [[ $(bc <<< "${load} >= (0.75 * $(nproc))") = 1 ]] && [[ $(bc <<< "${load} < $(nproc)") = 1 ]]; then
+                color=$color_medhigh
+        elif [[ $(bc <<< "${load} >= $(nproc)") = 1 ]]; then
+                color=$color_high
+        fi
+
+	loadstr="$(echo "scale=1;100.0*${load}/${cpus}" | bc)%"
+	echo '{ "full_text": "System load: '$loadstr'", "color":"'$color'" }'
+}
+
+getPiholeStatus() {
+	maybeUpdatePihole
+	status=$(cat ${DATA}/pihole | grep status)
+	if [ "${status}" = "status:online" ]; then
+        	cpu=$(   cat ${DATA}/pihole | grep cpu    | sed -r 's/.*\:([0-9\.]{1,})%/\1/')
+        	temp=$(  cat ${DATA}/pihole | grep temp   | sed -r 's/.*\:(\S+) F/\1 F/')
+	        uptime=$(cat ${DATA}/pihole | grep uptime | sed -r 's/.*\:up//' | tr ',' ':' | tr -d ' ' | sed -r 's/([0-9]{1,}[dhmy])[a-z\:]{1,}/\1/g')
+
+		if   [[ $(bc <<< "${cpu} <= 25.0") = 1 ]]; then
+			color=$color_low
+		elif [[ $(bc <<< "${cpu} <= 50.0") = 1 ]]; then
+			color=$color_medlow
+		elif [[ $(bc <<< "${cpu} <= 75.0") = 1 ]]; then
+			color=$color_medhigh
+		else
+			color=$color_high
+		fi
+		value="online(${cpu}%, ${uptime}, ${temp})"
+	else
+		color=$color_high
+		value="offline"
+	fi
+	echo '{ "full_text": "PiHole: '$value'", "color":"'$color'" }'
+}
+
+getDriveWear() {
+	value="$(sudo smartctl -a ${1} | grep 'Wear_Leveling_Count' | sed -r 's/^(\S+) +(\S+) +(\S+) +0(\S+) .*/\4/')%"
+	echo '{ "full_text": "'$1': '$value'", "color":"'$color_good'" }'
 }
 
 # Print data out and sleep 1s forever. This updates the status bar every second.
@@ -344,7 +442,7 @@ echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getVol), $(getIfaceIp 'wlan'), $(getPublicIp), $(getPing), $(getUpSpeed), $(getDownSpeed), $(getOutsideTemp), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getPublicIp), $(getPing), $(getOutsideTemp), $(utcTime), $(dateTime)]"
 	sleep 1
 done
 echo ']'

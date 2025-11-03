@@ -20,3 +20,4 @@ convert "${file1}" -blur 0x4 -modulate 110,50 -resize 5760x1080 "$file2"
 i3lock -fti "$file2"
 
 rm "$file2"
+
