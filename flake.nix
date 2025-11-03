@@ -14,7 +14,6 @@
         "x86_64-darwin"
         "aarch64-darwin"
       ];
-      overlays = import ./nix/overlays.nix inputs;
       forAllSystems =
         f:
         nixpkgs.lib.genAttrs systems (
@@ -22,7 +21,7 @@
           f (
             {
               pkgs = import nixpkgs {
-                inherit system overlays;
+                inherit system;
               };
               inherit system self;
               arch = builtins.elemAt (builtins.split "-" system) 0;
@@ -32,15 +31,20 @@
         );
     in
     {
+      # Define packages for all supported systems
       packages = forAllSystems (args: import ./nix/packages.nix args);
 
+      # Expose this flake as a NixOS module to easily integrate with NixOS and Home Manager
       nixosModules.default =
         { config, pkgs, ... }:
         {
           environment.systemPackages = with pkgs; [
-            self.packages.${pkgs.system}.default
-            speedtest-cli
+            self.packages.${pkgs.system}.default # scripts need to be in PATH and executable
+            speedtest-cli # needed by internet-speeds script
+            # TODO: what other dependencies are needed?
           ];
+
+          # put i3 config in the right place for NixOS with home-manager
           home-manager.sharedModules = [
             {
               xdg.configFile."i3".source = "${self.packages.${pkgs.system}.default}";
