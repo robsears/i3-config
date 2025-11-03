@@ -1,6 +1,6 @@
 ## Rob's i3 Configuration
 
-I use the [i3 Window Manager](http://i3wm.org/) in Arch Linux. This tiling window manager is fairly minimalistic yet still offers tons of great features. It is highly customizable, which is great, but this also means there are 
+I use the [i3 Window Manager](http://i3wm.org/) in ~~Arch Linux~~ NixOS. This tiling window manager is fairly minimalistic yet still offers tons of great features. It is highly customizable, which is great, but this also means there are 
 lots of little gotchas and tricks.
 
 I use a triple monitor set up, which complicates things a little bit. Getting the desktop to extend and orient correctly (and consistently) is a little bit of a challenge in X/i3. I also have a organizational system that works 
@@ -10,6 +10,27 @@ This repo is a collection of scripts and hotkeys I have developed over the cours
 transition from GNOME so much easier, but I learned a lot about the framework by reading and iterating on his code.
 
 Hopefully others who are using or looking to switch to i3 can get some help and inspiration from my set up too.
+
+### Nix / NixOS
+
+When I moved to NixOS, managing the i3 configurations became kind of a hassle; I had to clone this repo to `~/.config/i3` and manage it there. This isn't really ideal in Nix, as the window manager is kinda crucial to the system interface, and thus should be integral to the NixOS system configuration.
+
+I added a Nix Flake to this project, which simply defines the config and related scripts as a package. I also made use of `nixosModules`, which lets me define the software dependencies of this project independent from the software defined in my NixOS configuration.
+
+In other words, all software needed to run the scripts in this i3 configuration are defined in such a way that when added to a NixOS repo, the resulting system will have everything it needs to run this code.
+
+To add this to a NixOS system, simply open up the flake.nix and add this as an input:
+
+```nix
+  inputs = {
+    i3-config = {
+      url = "github:robsears/i3-config/nix/module";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+```
+
+Then make sure to add `i3-config` to your outputs, and `i3-config.nixosModules.default` to your system modules. This will ensure that your system ends up building with all necessary packages. Additionally, if you're using Home Manager, it will automatically place the output of this project in `~/.config/i3`.
 
 
 ### Installation

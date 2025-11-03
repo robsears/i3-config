@@ -40,7 +40,13 @@
         {
           environment.systemPackages = with pkgs; [
             self.packages.${pkgs.system}.default # scripts need to be in PATH and executable
+            i3 # i3 window manager, duh
+            maim # screenshot tool
+            terminator # terminal emulator
             speedtest-cli # needed by internet-speeds script
+            feh # wallpaper setter
+            imagemagick # needed by maim for image processing
+            scrot # screenshot tool
             # TODO: what other dependencies are needed?
           ];
 
