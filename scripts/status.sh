@@ -442,7 +442,7 @@ echo '{ "version": 1 }'
 echo '['
 echo '[]'
 while [ 1 = 1 ]; do
-	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getPublicIp), $(getPing), $(getOutsideTemp), $(utcTime), $(dateTime)]"
+	echo ",[$(getDisk '/'), $(getMem), $(getLoad), $(getVol), $(getPublicIp), $(getOutsideTemp), $(utcTime), $(dateTime)]"
 	sleep 1
 done
 echo ']'
