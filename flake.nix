@@ -2,7 +2,7 @@
   description = "i3 window manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs =
@@ -39,7 +39,7 @@
         { config, pkgs, ... }:
         {
           environment.systemPackages = with pkgs; [
-            self.packages.${pkgs.system}.default # scripts need to be in PATH and executable
+            self.packages.${pkgs.stdenv.hostPlatform.system}.default # scripts need to be in PATH and executable
             i3 # i3 window manager, duh
             maim # screenshot tool
             terminator # terminal emulator
@@ -53,7 +53,7 @@
           # put i3 config in the right place for NixOS with home-manager
           home-manager.sharedModules = [
             {
-              xdg.configFile."i3".source = "${self.packages.${pkgs.system}.default}";
+              xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
             }
           ];
         };
