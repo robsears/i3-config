@@ -55,8 +55,11 @@
             {
               xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
 
-              # Create directory by placing a hidden file in it
-              home.file.".config/i3/data/.keep".text = "";
+              # Create directory for data caching
+              home.activation.createI3DataDir = config.lib.dag.entryAfter [ "writeBoundary" ] ''
+                mkdir -p ~/.config/i3/data
+                chmod 700 ~/.config/i3/data
+              '';
             }
           ];
         };
