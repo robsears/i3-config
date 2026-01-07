@@ -6,6 +6,5 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore all data files:
-data/*
 scripts/.weather-api
 result
