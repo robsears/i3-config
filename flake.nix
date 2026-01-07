@@ -55,10 +55,8 @@
             {
               xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
 
-              # Create the data directory using systemd tmpfiles
-              systemd.user.tmpfiles.rules = [
-                "d %h/.config/i3/data 0700 - - -"
-              ];
+              # Create directory by placing a hidden file in it
+              home.file.".config/i3/data/.keep".text = "";
             }
           ];
         };
