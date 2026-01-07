@@ -54,6 +54,11 @@
           home-manager.sharedModules = [
             {
               xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
+
+              # Create the data directory using systemd tmpfiles
+              systemd.user.tmpfiles.rules = [
+                "d %h/.config/i3/data 0700 - - -"
+              ];
             }
           ];
         };
