@@ -8,8 +8,7 @@
 # to the cache.
 
 # Get the directories involved:
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-DATA="${DIR}/../data"
+DATA="${HOME}/.config/i3-data"
 
 # The .weather-api file should contain the OpenWeatherMap API key, which is in
 #the .gitignore file so we don't need to commit it to source control.

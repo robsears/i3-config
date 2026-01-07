@@ -57,9 +57,9 @@
 
               # Create the data directory
               home.activation.createI3DataDir = ''
-                if [ ! -d "$HOME/.config/i3/data" ]; then
-                  mkdir -p "$HOME/.config/i3/data"
-                  chmod 700 "$HOME/.config/i3/data"
+                if [ ! -d "$HOME/.config/i3-data" ]; then
+                  mkdir -p "$HOME/.config/i3-data"
+                  chmod 700 "$HOME/.config/i3-data"
                 fi
               '';
             }

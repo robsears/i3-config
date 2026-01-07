@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Get the network addresses for a given interface, write out to ../data/public_ipv4.
+# Get the network addresses for a given interface, write out to ~/.config/i3-data/public_ipv4.
 
 NETWORK=$(ip route | grep default | head -n1 | tr ' ' ',' | sed -r 's/^(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+),(.+)$/\3,\9,\5/')
 
@@ -10,8 +10,7 @@ WIFI_NAME=$(iwgetid -r)
 
 
 # Get the directories involved:
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-DATA="${DIR}/../data"
+DATA="${HOME}/.config/i3-data"
 
 # Output the network information:
 echo "public-ipv4: $(curl -s ipinfo.io/ip)" > "${DATA}/public-ipv4"

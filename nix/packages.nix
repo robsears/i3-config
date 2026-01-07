@@ -12,7 +12,6 @@ let
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/data
       mkdir -p $out/scripts
 
       cp    ${../config} $out/config

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-DATA="${DIR}/../data"
+DATA="${HOME}/.config/i3-data"
 REFRESH=600 # Seconds for the internet speed and IP information to live
 PIHOLE_REFRESH=10 # seconds for the pi-hole service to live
 
