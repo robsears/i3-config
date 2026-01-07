@@ -16,7 +16,6 @@ let
       mkdir -p $out/scripts
 
       cp    ${../config} $out/config
-      cp -r ${../data}/* $out/data/
       cp -r ${../scripts}/* $out/scripts/
 
       runHook postInstall
