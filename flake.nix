@@ -56,9 +56,12 @@
               xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
 
               # Create the data directory
-              systemd.user.tmpfiles.rules = [
-                "d %h/.config/i3/data 0700 - - -"
-              ];
+              home.activation.createI3DataDir = ''
+                if [ ! -d "$HOME/.config/i3/data" ]; then
+                  mkdir -p "$HOME/.config/i3/data"
+                  chmod 700 "$HOME/.config/i3/data"
+                fi
+              '';
             }
           ];
         };
