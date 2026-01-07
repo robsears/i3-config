@@ -53,13 +53,12 @@
           # put i3 config in the right place for NixOS with home-manager
           home-manager.sharedModules = [
             {
-              xdg.configFile."i3" = {
-                source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
-                recursive = true;
-              };
+              xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
 
-              # Still need to create the data directory
-              xdg.configFile."i3/data/.keep".text = "";
+              # Create the data directory
+              systemd.user.tmpfiles.rules = [
+                "d %h/.config/i3/data 0700 - - -"
+              ];
             }
           ];
         };
