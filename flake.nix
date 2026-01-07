@@ -53,13 +53,13 @@
           # put i3 config in the right place for NixOS with home-manager
           home-manager.sharedModules = [
             {
-              xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
+              xdg.configFile."i3" = {
+                source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
+                recursive = true;
+              };
 
-              # Create directory for data caching
-              home.activation.createI3DataDir = config.lib.dag.entryAfter [ "writeBoundary" ] ''
-                mkdir -p ~/.config/i3/data
-                chmod 700 ~/.config/i3/data
-              '';
+              # Still need to create the data directory
+              xdg.configFile."i3/data/.keep".text = "";
             }
           ];
         };
