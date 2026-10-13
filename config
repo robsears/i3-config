@@ -67,7 +67,7 @@ bindsym $windows+Prior         exec "$scripts/mediaplayer.sh 'volume_up'"
 # Windows + PageDn key decreases the system volume
 bindsym $windows+Next          exec "$scripts/mediaplayer.sh 'volume_down'"
 
-# Windows + Shift + PageDn key mutes/unmutes the system volume
+# Windows + Shift + Pause key mutes/unmutes the system volume
 bindsym $windows+Shift+Pause   exec "$scripts/mediaplayer.sh 'volume_mute'"
 
 ###
@@ -116,7 +116,6 @@ bar {
 font pango:DejaVu Sans Mono 8
 
 # Define named workspaces on specific monitors:
-workspace "atom"        output $center_monitor
 workspace "blender"     output $center_monitor
 workspace "code"        output $center_monitor
 workspace "firefox"     output $center_monitor
@@ -140,7 +139,6 @@ workspace "slack"       output $left_monitor
 # Note: To get the class and instance, you can use xprop. The first
 # part of the WM_CLASS is the instance ("irssi" in this example),
 # the second part is the class ("URxvt" in this example).
-assign [class="Atom"]                 "atom"
 assign [class="Blender"]              "blender"
 assign [class="Brave"]                "web"
 assign [class="Code"]                 "code"

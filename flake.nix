@@ -11,8 +11,6 @@
       systems = [
         "x86_64-linux"
         "aarch64-linux"
-        "x86_64-darwin"
-        "aarch64-darwin"
       ];
       forAllSystems =
         f:
@@ -24,7 +22,6 @@
                 inherit system;
               };
               inherit system self;
-              arch = builtins.elemAt (builtins.split "-" system) 0;
             }
             // inputs
           )
@@ -36,20 +33,19 @@
 
       # Expose this flake as a NixOS module to easily integrate with NixOS and Home Manager
       nixosModules.default =
-        { config, pkgs, ... }:
+        { config, lib, options, pkgs, ... }:
         {
           environment.systemPackages = with pkgs; [
             self.packages.${pkgs.stdenv.hostPlatform.system}.default # scripts need to be in PATH and executable
             i3 # i3 window manager, duh
             maim # screenshot tool
             terminator # terminal emulator
-            speedtest-cli # needed by internet-speeds script
             feh # wallpaper setter
             imagemagick # needed by maim for image processing
             scrot # screenshot tool
-            # TODO: what other dependencies are needed?
           ];
-
+        }
+        // lib.optionalAttrs (options ? home-manager) {
           # put i3 config in the right place for NixOS with home-manager
           home-manager.sharedModules = [
             {
