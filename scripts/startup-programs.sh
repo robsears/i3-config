@@ -13,7 +13,7 @@ i3-msg "workspace \"web\"; exec $(which brave)"
 
 # Open up apps that I use all the time: VS Code, Slack, and Spotify.
 # These will all automatically load in workspaces defined in ../config.
-i3-msg "workspace \"code\"; exec $(which code); workspace \"chat\"; exec $(which slack); workspace \"spotify\"; exec $(which spotify)"
+i3-msg "workspace \"code\"; exec $(which code); workspace \"slack\"; exec $(which slack); workspace \"spotify\"; exec $(which spotify)"
 
 # Open up Firefox in a new window
 i3-msg "exec $(which firefox) -p Personal"
