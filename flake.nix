@@ -35,30 +35,39 @@
       nixosModules.default =
         { config, lib, options, pkgs, ... }:
         {
-          environment.systemPackages = with pkgs; [
-            self.packages.${pkgs.stdenv.hostPlatform.system}.default # scripts need to be in PATH and executable
-            i3 # i3 window manager, duh
-            maim # screenshot tool
-            terminator # terminal emulator
-            feh # wallpaper setter
-            imagemagick # needed by maim for image processing
-            scrot # screenshot tool
-          ];
-        }
-        // lib.optionalAttrs (options ? home-manager) {
-          # put i3 config in the right place for NixOS with home-manager
-          home-manager.sharedModules = [
+          # `options ? home-manager` has to be deferred inside `config` --
+          # checking it at the top level of the module's returned attrset
+          # (e.g. via `//`) forces `options` while NixOS is still building
+          # `options` itself (it must call this module to classify its
+          # shape), which is an infinite recursion.
+          config = lib.mkMerge [
             {
-              xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
-
-              # Create the data directory
-              home.activation.createI3DataDir = ''
-                if [ ! -d "$HOME/.config/i3-data" ]; then
-                  mkdir -p "$HOME/.config/i3-data"
-                  chmod 700 "$HOME/.config/i3-data"
-                fi
-              '';
+              environment.systemPackages = with pkgs; [
+                self.packages.${pkgs.stdenv.hostPlatform.system}.default # scripts need to be in PATH and executable
+                i3 # i3 window manager, duh
+                maim # screenshot tool
+                terminator # terminal emulator
+                feh # wallpaper setter
+                imagemagick # needed by maim for image processing
+                scrot # screenshot tool
+              ];
             }
+            (lib.optionalAttrs (options ? home-manager) {
+              # put i3 config in the right place for NixOS with home-manager
+              home-manager.sharedModules = [
+                {
+                  xdg.configFile."i3".source = "${self.packages.${pkgs.stdenv.hostPlatform.system}.default}";
+
+                  # Create the data directory
+                  home.activation.createI3DataDir = ''
+                    if [ ! -d "$HOME/.config/i3-data" ]; then
+                      mkdir -p "$HOME/.config/i3-data"
+                      chmod 700 "$HOME/.config/i3-data"
+                    fi
+                  '';
+                }
+              ];
+            })
           ];
         };
     };
